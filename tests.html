@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>Tests</title>
+	</head>
+	<body>
+		<script>
+			Intl.NumberFormat.prototype.formatToPartsOriginal = Intl.NumberFormat.prototype.formatToParts;
+			Intl.NumberFormat.prototype.formatToParts = undefined;
+		</script>
+		
+		<script src="NumberFormat.formatToParts.polyfill.js"></script>
+		
+		<script>
+			let hasErrors = false;
+			
+			let numbers = [ 0, 1, 10, 1337, 420.69, -1234567.89, 1234567.89, 1.50, -3.50 ];
+			let currencies = [ "BGN", "EUR", "GBP", "CNY", "USD", "CAD" ];
+			let locales = [ "bg-bg", "en-us", "en-gb", "en-ca", "fr-fr", "el-gr", "it-it" ];
+			
+			for(let c = 0; c < currencies.length; c++)
+			{
+				let currency = currencies[c];
+				
+				for(let l = 0; l < locales.length; l++)
+				{
+					let locale = locales[l];
+					
+					let format = new Intl.NumberFormat(locale, { style: "currency", currency: currency });
+					
+					for(let n = 0; n < numbers.length; n++)
+					{
+						let number = numbers[n];
+					
+						let a = format.formatToPartsOriginal(number);
+						let b = format.formatToParts(number);
+						
+						if(JSON.stringify(a) == JSON.stringify(b))
+						{
+							console.log(locale, "Original:", a, "Polyfill:", b);
+						}
+						else
+						{
+							console.error(locale, "Original:", a, "Polyfill:", b);
+							hasErrors = true;
+						}
+					}
+				}
+			}
+			
+			if(!hasErrors)
+			{
+				console.log("All tests passed successfully.");
+			}
+			else
+			{
+				console.error("There were errors.");
+			}
+		</script>
+	</body>
+</html>
